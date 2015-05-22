@@ -1,14 +1,13 @@
-Description: Ignore Debian-specific packaging dirs debian/ and .pc/ in bundlebuilder.py
-Author: Jonas Smedegaard <dr@jones.dk>
-Last-Update: 2010-02-08
+diff --git a/src/sugar3/activity/bundlebuilder.py b/src/sugar3/activity/bundlebuilder.py
+index 11e6edf..ff4bdbd 100644
 --- a/src/sugar3/activity/bundlebuilder.py
 +++ b/src/sugar3/activity/bundlebuilder.py
-@@ -37,7 +37,7 @@
+@@ -37,7 +37,7 @@ from sugar3 import env
  from sugar3.bundle.activitybundle import ActivityBundle
  
  
--IGNORE_DIRS = ['dist', '.git']
-+IGNORE_DIRS = ['dist', '.git', 'debian', '.pc']
+-IGNORE_DIRS = ['dist', '.git', 'screenshots']
++IGNORE_DIRS = ['dist', '.git', 'screenshots', 'debian', '.pc']
  IGNORE_FILES = ['.gitignore', 'MANIFEST', '*.pyc', '*~', '*.bak', 'pseudo.po']
  
  
