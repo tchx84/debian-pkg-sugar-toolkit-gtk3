@@ -86,7 +86,7 @@ CDBS_REPLACES_$(pkg-bin) = $(obsoletes)
 
 # Avoid python-sugar3 depending too relaxed on its GIR
 #  * TODO: Drop when Stretch is stable
-CDBS_BREAKS_$(pkg-gir) = $(pkg-python) (<< 0.104.1)
+CDBS_BREAKS_$(pkg-gir) = $(pkg-python) (<< 0.105.1)
 
 # Multiarch quirks
 #  * TODO: Drop when Jessie is stable
