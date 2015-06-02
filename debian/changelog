@@ -1,3 +1,9 @@
+sugar-toolkit-gtk3 (0.105.2-1~tch1) trusty; urgency=medium
+
+  * upstream 0.105.2
+
+ -- Martin Abente Lahaye <tch@tch>  Tue, 02 Jun 2015 09:43:57 -0400
+
 sugar-toolkit-gtk3 (0.105.1-2~quozl1) trusty; urgency=medium
 
   * rebase against debian 0.104.1-7
