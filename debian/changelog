@@ -16,6 +16,22 @@ sugar-toolkit-gtk3 (0.105.1-1~tch1) trusty; urgency=medium
 
  -- Martin Abente Lahaye <tch@tch>  Fri, 22 May 2015 11:34:24 -0400
 
+sugar-toolkit-gtk3 (0.104.1-8) unstable; urgency=medium
+
+  * Adapt packaging in maintainer mode when targeting experimental:
+    + Switch git packaging branch.
+    + Track any release (else only current branch).
+  * Update package relations:
+    + Relax to build-depend unversioned on libgirepository1.0-dev, and
+      recommend unversioned telepathy-mission-control-5 and
+      telepathy-salut: Needed versions satisfied even in oldstable.
+    + Stop declare pre-dependency on multiarch-support: Handled by
+      debhelper.
+    + Tighten build-dependency on d-shlibs, and drop local overrides.
+  * Stop manually remove .la file: Handled by d-shlibs.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Sun, 14 Jun 2015 15:09:29 -0500
+
 sugar-toolkit-gtk3 (0.104.1-7) unstable; urgency=medium
 
   * Improve short descriptions.

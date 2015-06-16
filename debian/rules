@@ -24,6 +24,7 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 
 # TODO: convince upstream to install headers, and provide proper -dev package
 stem = sugarext
+pkgbranch = $(basename $(DEB_UPSTREAM_VERSION))
 abi = 0
 lib = lib$(stem)
 pkg-lib = lib$(stem)$(abi)
@@ -34,16 +35,36 @@ pkg-data = lib$(stem)-data
 pkg-bin = python-sugar3
 pkg-python = python-sugar3
 
+# Adapt packaging in maintainer mode when targeting experimental branch:
+#  * Switch git packaging branch
+#  * Track any release (else only current branch)
+ifneq (,$(DEB_MAINTAINER_MODE))
+experimental := $(strip $(if \
+	$(shell dpkg-parsechangelog \
+		| grep -x 'Distribution: \(experimental\|UNRELEASED\)'),\
+	yes))
+watch-limit = $(if $(experimental),,$(pkgbranch)\\.)
+debian-branch = $(if $(experimental),master,master-$(pkgbranch))
+clean::
+	perl -i -pe 's/\([\d.\\]*\.\*\)/($(watch-limit).*)/' \
+		debian/watch
+	perl -i -pe 's/^debian-branch *= *\K.*/$(debian-branch)/' \
+		debian/gbp.conf
+endif
+
 DEB_UPSTREAM_URL = http://download.sugarlabs.org/sources/sucrose/glucose/$(DEB_UPSTREAM_PACKAGE)
 DEB_UPSTREAM_TARBALL_EXTENSION = tar.xz
+
+# Build-depend unversioned on debhelper
+#  TODO: Drop when adopted in cdbs
+CDBS_BUILD_DEPENDS_rules_debhelper_v9 = debhelper
 
 # Needed by upstream build process
 #  * linux-libc-dev/hurd-dev needed by sugar-fatattr
 dev-bdeps = gtk-3 gdk-pixbuf2.0 sm ice rsvg2 xfixes xi x11
 bdeps = $(patsubst %,$(comma) lib%-dev,$(dev-bdeps))
 bdeps +=, gettext, intltool, libxml-parser-perl, x11proto-core-dev
-bdeps +=, libasound2-dev | libasound-dev
-bdeps +=, libgirepository1.0-dev (>= 1.30.0)
+bdeps +=, libasound2-dev | libasound-dev, libgirepository1.0-dev
 bdeps +=, linux-libc-dev [linux-any], hurd-dev [hurd-any]
 
 # Needed (always/often/seldom) at runtime
@@ -64,9 +85,9 @@ depends +=, gir1.2-sugarext-1.0 (<< $(DEB_VERSION).1~)
 depends +=, gir1.2-webkit2-4.0 | gir1.2-webkit2-3.0 | gir1.2-webkit-3.0
 depends-dev = $(pkg-gir) (= $(DEB_VERSION))
 depends-gir = $(pkg-lib) (= $(DEB_VERSION))
-recommends = unzip, telepathy-mission-control-5 (>= 1:5.6), alsa-utils
+recommends = unzip, telepathy-mission-control-5, alsa-utils
 recommends +=, telepathy-gabble-legacy | telepathy-gabble (<< 0.17.25)
-recommends +=, telepathy-salut (>= 0.4), shared-mime-info
+recommends +=, telepathy-salut, shared-mime-info
 recommends +=, gir1.2-webkit2-4.0 | gir1.2-webkit2-3.0
 suggests = git, ipython
 
@@ -89,8 +110,6 @@ CDBS_REPLACES_$(pkg-bin) = $(obsoletes)
 CDBS_BREAKS_$(pkg-gir) = $(pkg-python) (<< 0.104.1)
 
 # Multiarch quirks
-#  * TODO: Drop when Jessie is stable
-CDBS_PREDEPENDS_$(pkg-lib) = $(if $(DEB_HOST_MULTIARCH),multiarch-support)
 DEB_CONFIGURE_EXTRA_FLAGS += --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH)
 
 #DEB_AUTOMAKE_ARGS = --add-missing --copy
@@ -113,17 +132,12 @@ binary-post-install/$(pkg-data)::
 
 # Let d-shlibs calculate development package dependencies
 #  and handle shared library install
-CDBS_BUILD_DEPENDS += , d-shlibs (>= 0.48)
+CDBS_BUILD_DEPENDS += , d-shlibs (>= 0.59~)
 binary-post-install/$(pkg-lib):: debian/stamp-local-shlibs-$(lib)
-debian/stamp-local-shlibs-$(lib): binary-install/$(pkg-lib) debian/stamp-local-strip-la
+debian/stamp-local-shlibs-$(lib): binary-install/$(pkg-lib)
 	d-shlibmove --commit \
 		--multiarch \
 		--exclude-la --exclude-a \
-		--override s/libcairo-gobject2-dev/libcairo-dev/ \
-		--override s/libgdk-3-0-dev/libgtk-3-dev/ \
-		--override s/libgtk-3-0-dev/libgtk-3-dev/ \
-		--override s/librsvg-2-2-dev/librsvg2-dev/ \
-		--override s/libgconf-2-4-dev/libgconf2-dev/ \
 		--devunversioned --ignorelibdep \
 		--movedev debian/tmp/usr/share/gir-1.0 usr/share/ \
 		--extralib debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/libsugar-eventcontroller.so \
@@ -131,14 +145,6 @@ debian/stamp-local-shlibs-$(lib): binary-install/$(pkg-lib) debian/stamp-local-s
 	touch $@
 clean::
 	rm -f debian/stamp-local-shlibs-$(lib)
-
-# avoid unneeded .la file
-binary-post-install/$(pkg-python):: debian/stamp-local-strip-la
-debian/stamp-local-strip-la: binary-install/$(pkg-python)
-	find debian -type f -name '*.la' -delete
-	touch $@
-clean::
-	rm -f debian/stamp-local-strip-la
 
 # Ensure proper hash-bang in Python script (Python Policy 0.9 §3.1)
 #  * TODO: drop cdbs_python_binary fallback when cdbs 0.5 is stable
