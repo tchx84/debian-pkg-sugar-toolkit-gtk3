@@ -1,3 +1,9 @@
+sugar-toolkit-gtk3 (0.105.2-1~tch2) trusty; urgency=medium
+
+  * Merged with upstream.
+
+ -- Martin Abente Lahaye <tch@sugarlabs.org>  Tue, 16 Jun 2015 09:43:57 -0400
+
 sugar-toolkit-gtk3 (0.105.2-1~tch1) trusty; urgency=medium
 
   * upstream 0.105.2
