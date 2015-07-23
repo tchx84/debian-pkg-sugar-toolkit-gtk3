@@ -1,3 +1,9 @@
+sugar-toolkit-gtk3 (0.106.0-2~0tch1) trusty; urgency=medium
+
+  * Rebuilt for Ubuntu trusty.
+
+ -- Martin Abente Lahaye <tch@sugarlabs.org>  Thu, 23 Jul 2015 15:59:46 -0400
+
 sugar-toolkit-gtk3 (0.106.0-1) unstable; urgency=medium
 
   [ upstream ]
