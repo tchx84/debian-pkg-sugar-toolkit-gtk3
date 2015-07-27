@@ -89,6 +89,7 @@ depends-gir +=, gobject-introspection (>= 1.42.0-2.2)
 recommends = unzip, telepathy-mission-control-5, alsa-utils
 recommends +=, telepathy-gabble-legacy | telepathy-gabble (<< 0.17.25)
 recommends +=, telepathy-salut, shared-mime-info
+recommends +=, gst-plugins-espeak
 suggests = git, ipython
 
 CDBS_BUILD_DEPENDS +=, $(bdeps)
