@@ -1,3 +1,9 @@
+sugar-toolkit-gtk3 (0.106.0-2~0tch2) trusty; urgency=medium
+
+  * Fix and add missing dependencies.
+
+ -- Martin Abente Lahaye <tch@sugarlabs.org>  Mon, 27 Jul 2015 18:06:51 -0400
+
 sugar-toolkit-gtk3 (0.106.0-2~0tch1) trusty; urgency=medium
 
   * Rebuilt for Ubuntu trusty.
