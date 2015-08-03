@@ -1,0 +1,33 @@
+From fd15e76dabee72e7cf4d0369b63277353c3ae33f Mon Sep 17 00:00:00 2001
+From: Gonzalo Odiard <godiard@gmail.com>
+Date: Fri, 24 Jul 2015 15:07:09 -0300
+Subject: [PATCH] MouseDetector timeout_id need reset
+
+The mouse detector have a variable to store the id for the timeout.
+The stop() method check if the id is null but do not set the id to null
+after remove the GObject timeout, then try to remove the timeout multiple times.
+
+The efect can be seen if a user move the mouse slowly over the icons
+in the Sugar home, in shell.log we see many lines like:
+
+sugar3/graphics/palettewindow.py:443: Warning: Source ID 2464 was not found
+when attempting to remove it
+---
+ src/sugar3/graphics/palettewindow.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/sugar3/graphics/palettewindow.py b/src/sugar3/graphics/palettewindow.py
+index 13684fa..3ea5f01 100644
+--- a/src/sugar3/graphics/palettewindow.py
++++ b/src/sugar3/graphics/palettewindow.py
+@@ -441,6 +441,7 @@ class MouseSpeedDetector(GObject.GObject):
+     def stop(self):
+         if self._timeout_hid is not None:
+             GObject.source_remove(self._timeout_hid)
++            self._timeout_hid = None
+         self._state = None
+ 
+     def _get_mouse_position(self):
+-- 
+2.1.0
+
